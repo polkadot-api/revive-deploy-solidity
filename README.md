@@ -15,10 +15,10 @@ This will install the necessary packages and generate the contract's ABI, code a
 
 It relies on:
 
-- (`@parity/resolc`)[https://github.com/paritytech/revive] to generate ABI+PVM from `.sol`.
+- [`@parity/resolc`](https://github.com/paritytech/revive) to generate ABI+PVM from `.sol`.
 - `@wagmi/cli` to generate the ABI types.
 - `viem` to encode and decode function calls (fully typed).
-- (`polkadot-api`)[https://papi.how/] to connect and interact with revive pallet.
+- [`polkadot-api`](https://papi.how/) to connect and interact with revive pallet.
 
 ## Usage
 
