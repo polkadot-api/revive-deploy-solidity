@@ -26,10 +26,10 @@ The contract source is `3_Ballot.sol`. This is an example contract found in Remi
 
 This repo has 3 scripts ready to interact with the contract:
 
-- `bun deploy {dev account name}`
+- `bun run deploy {dev account name}`
   - Runs `src/deploy.ts` to deploy the contract.
   - For the account name you can put any string
-  - e.g. `bun deploy Alice` will deploy as Alice, but please use your own name, the script will guide you in case you need to set your account up.
+  - e.g. `bun run deploy Alice` will deploy as Alice, but please use your own name, the script will guide you in case you need to set your account up.
   - Will give you a deployment address as a result
 - `bun winning {dev account name} {address}`
   - Runs `src/winning.ts` to read from a view-only function and storage.

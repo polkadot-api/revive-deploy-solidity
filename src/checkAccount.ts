@@ -37,7 +37,9 @@ export async function checkAccount(name: string) {
 }
 
 const getBalance = (addr: SS58String) =>
-  typedApi.query.System.Account.getValue(addr).then((acc) => {
+  typedApi.query.System.Account.getValue(addr, {
+    at: "best",
+  }).then((acc) => {
     const v = acc.data;
 
     // https://wiki.polkadot.network/learn/learn-account-balances/
@@ -54,5 +56,3 @@ const getBalance = (addr: SS58String) =>
 
     return spendable;
   });
-
-const maxBigInt = (a: bigint, b: bigint) => (a > b ? a : b);

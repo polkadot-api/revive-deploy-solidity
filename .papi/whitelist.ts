@@ -5,4 +5,5 @@ export const whitelist: PassethubWhitelistEntry[] = [
   "*.System",
   "*.Balances",
   "*.Utility",
+  "api.ReviveApi.*",
 ];
