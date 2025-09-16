@@ -1,26 +1,21 @@
-import { passethub } from "@polkadot-api/descriptors";
-import { Binary, createClient } from "polkadot-api";
-import { getWsProvider } from "polkadot-api/ws-provider/web";
+import { Binary } from "polkadot-api";
 import { encodeDeployData, toHex } from "viem";
+import { client, typedApi } from "./chain";
+import { checkAccount } from "./checkAccount";
 import { ballotAbi } from "./generated";
-import { devAccount, trackTx } from "./util";
+import { stringify, trackTx } from "./util";
 
-import "./checkAccount";
-process.exit(0);
+const devName = process.argv[2];
+if (!devName) {
+  console.log("Missing account name");
+  console.log("Usage: bun deploy {account name}");
+  process.exit(1);
+}
 
-const client = createClient(
-  getWsProvider([
-    "wss://testnet-passet-hub.polkadot.io",
-    "wss://passet-hub-paseo.ibp.network",
-  ])
-);
-const typedApi = client.getTypedApi(passethub);
+const account = await checkAccount(devName);
 
 const pvmFile = Bun.file("./3_Ballot_sol_Ballot.polkavm");
-console.log("Loading pvm file");
 const pvmBytes = Binary.fromBytes(await pvmFile.bytes());
-
-console.log("Encoding data");
 
 // Constructor takes an array of 32-byte strings
 const titleToHex = (title: string) =>
@@ -33,47 +28,49 @@ const data = encodeDeployData({
   bytecode: "0x",
 });
 
-console.log("Wait connection");
-await typedApi.compatibilityToken;
-
-const account = devAccount("Oliva");
-
-console.log("Dry running");
 const instantiateResult = await typedApi.apis.ReviveApi.instantiate(
   account.address,
-  0n,
-  undefined,
-  undefined,
+  0n, // transferred value
+  undefined, // gas limit (unknown)
+  undefined, // storage deposit limit (unknown)
   {
     type: "Upload",
     value: pvmBytes,
   },
   Binary.fromHex(data),
-  undefined
+  undefined, // salt (use default)
+  // Because we might have mapped the account and that might not be yet finished
+  {
+    at: "best",
+  }
 );
 
-console.log(
-  JSON.stringify(instantiateResult.result.value, (_, v) =>
-    typeof v === "bigint" ? v.toString() : v instanceof Binary ? v.asHex() : v
-  )
-);
+console.log("Dry run result: " + stringify(instantiateResult.result.value));
 
-if (!instantiateResult.result.success) {
-  throw new Error("Not successful");
+if (
+  !instantiateResult.result.success ||
+  instantiateResult.result.value.result.flags > 0
+) {
+  throw new Error("Dry run not successful");
 }
 
-// await trackTx(
-//   typedApi.tx.Revive.instantiate_with_code({
-//     code: pvmBytes,
-//     data: Binary.fromHex(data),
-//     gas_limit: instantiateResult.gas_required,
-//     salt: undefined,
-//     storage_deposit_limit: instantiateResult.storage_deposit.value,
-//     value: 0n,
-//   }).signSubmitAndWatch(account.signer, {
-//     at: "finalized",
-//   })
-// );
+console.log("Deploying (might take a minute)");
+const res = await trackTx(
+  typedApi.tx.Revive.instantiate_with_code({
+    code: pvmBytes,
+    data: Binary.fromHex(data),
+    gas_limit: instantiateResult.gas_required,
+    salt: undefined,
+    storage_deposit_limit: instantiateResult.storage_deposit.value,
+    value: 0n,
+  }).signSubmitAndWatch(account.signer)
+);
+
+if (res.ok) {
+  console.log(
+    "deployed to address: " + instantiateResult.result.value.addr.asHex()
+  );
+}
 
 // Teardown
 client.destroy();

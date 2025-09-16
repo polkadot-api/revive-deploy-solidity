@@ -12,6 +12,6 @@ console.log("Formatting ABI");
 execSync("bun wagmi generate");
 
 console.log("Generating chain types");
-execSync("bun papi", {
+execSync("bun papi --whitelist .papi/whitelist.ts", {
   stdio: "inherit",
 });

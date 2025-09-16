@@ -77,3 +77,8 @@ export const trackBestTx = (obs: Observable<TxEvent>) =>
       },
     });
   });
+
+export const stringify = (value: any) =>
+  JSON.stringify(value, (_, v) =>
+    typeof v === "bigint" ? v.toString() : v instanceof Binary ? v.asHex() : v
+  );
