@@ -8,5 +8,14 @@
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "scripts": {
+    "postinstall": "bun ./prepare.ts"
+  },
+  "dependencies": {
+    "@parity/resolc": "^0.3.0",
+    "@polkadot-api/descriptors": "file:.papi/descriptors",
+    "@polkadot-api/sdk-ink": "^0.4.1",
+    "polkadot-api": "^1.17.2"
   }
 }
