@@ -10,12 +10,17 @@
     "typescript": "^5"
   },
   "scripts": {
-    "postinstall": "bun ./prepare.ts"
+    "codegen": "bun run ./prepare.ts",
+    "deploy": "bun run ./scripts/deploy.ts"
   },
   "dependencies": {
     "@parity/resolc": "^0.3.0",
     "@polkadot-api/descriptors": "file:.papi/descriptors",
-    "@polkadot-api/sdk-ink": "^0.4.1",
-    "polkadot-api": "^1.17.2"
+    "@polkadot-api/sdk-ink": "^0.4.2",
+    "@polkadot-labs/hdkd": "^0.0.24",
+    "@polkadot-labs/hdkd-helpers": "^0.0.25",
+    "@wagmi/cli": "^2.5.1",
+    "polkadot-api": "^1.17.2",
+    "viem": "^2.37.6"
   }
 }
